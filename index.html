@@ -303,7 +303,8 @@ footer { margin-top: 3.5rem; padding-top: 1.2rem; border-top: 1px solid var(--ru
     </li>
     <li>
       <h3>Sjednoťte a seskupte data <span class="who script">skript</span></h3>
-      <p>Recenze z různých zdrojů převeďte na jeden formát, odfiltrujte prázdné („spokojenost“, „funguje“) a seskupte je k produktům podle ID nebo EAN. Pozor na recenze, které visí u víc produktů najednou. Jsou slabším dokladem a skript by je měl označit.</p>
+      <p>Recenze z různých zdrojů převeďte na jeden formát, odfiltrujte prázdné („spokojenost“, „funguje“) a seskupte je k produktům podle ID nebo EAN. Když recenze nesou jen název produktu, skript je páruje podle normalizovaného názvu a nespárované vypíše. Pozor na recenze, které visí u víc produktů najednou. Jsou slabším dokladem a skript by je měl označit.</p>
+      <p><strong>Ověřte, že máte všechny zdroje.</strong> Recenze bývají na víc místech: v exportu ze současné platformy, v tabulce po migraci, u srovnávače. Jeden zdroj snadno chybí. V testu měla tabulka k jednomu produktu 3 recenze s textem a projekt v Mergadu 8.</p>
     </li>
     <li>
       <h3>Vytáhněte tvrzení <span class="who agent">agent</span> <span class="who you">vy</span></h3>
@@ -323,10 +324,16 @@ footer { margin-top: 3.5rem; padding-top: 1.2rem; border-top: 1px solid var(--ru
         </table>
       </div>
       <p>Dvě pravidla platí bez výjimky: čísla se negenerují, jen přenášejí, a každé tvrzení má zdroj. Tvrzení si projděte a schvalte, než se z nich začne psát. Tady se chyby chytají nejlevněji.</p>
+      <ul>
+        <li><strong>Selektor nestavte jen na kategorii.</strong> V kategorii bývají i doplňky, dárkové poukazy nebo příbuzné produkty, na které tvrzení neplatí. Agent má u každého selektoru vypsat, co do něj spadlo, a vyloučit to podle názvu, typu nebo značky.</li>
+        <li><strong>Články si můžou odporovat</strong> navzájem i s popisky. Takové tvrzení se nepoužije, dokud ho klient nerozhodne.</li>
+        <li><strong>Bezpečnostní a zdravotní tvrzení</strong> (jak dlouho nosit, kdy přestat) schvaluje klient a nepřenášejí se na produkty se zvláštním určením, třeba zdravotní pomůcky.</li>
+      </ul>
     </li>
     <li>
       <h3>Napište doplněk popisku <span class="who agent">agent</span> <span class="who you">vy</span></h3>
       <p>Stávající popisek se nepřepisuje. Pod něj přibude krátký blok s tím, co popisek výrobce neříká: co zákazník k produktu potřebuje, kdy se nehodí, na co si dát pozor. Nejvýš 4 odrážky a 600 znaků. Co už v popisku je, se neopakuje. Když si tvrzení s popiskem odporuje, nepíše se ani jedno.</p>
+      <p>Opakování a rozpor s popiskem musí agent posoudit po smyslu u každého produktu zvlášť. Kontrola podle klíčových slov nestačí: „po pár hodinách tlačí v patě“ ji projde, i když popisek tvrdí „pohodlná na celodenní túry“.</p>
       <div class="out">
         <div class="old">Treková bota s membránou a gumovou špičkou. Svršek z broušené kůže, podrážka s hlubokým vzorkem…</div>
         <div class="new"><b>Co je dobré vědět před nákupem</b>
@@ -361,6 +368,7 @@ Co je dobré vědět před nákupem
           </tbody>
         </table>
       </div>
+      <p><strong>Párujte podle skupiny, když to jde.</strong> U oblečení je každá velikost samostatná položka, ale doplněk se liší jen mezi modely. Import pak páruje přes <code>item_group_id</code> a tabulka má řádek na model, ne na velikost (v testu 28 řádků pro 215 položek). Produkty bez skupiny se párují přes vlastní ID.</p>
       <p>Na začátek stačí tabulku do importu nahrát jako soubor. Pro pravidelné aktualizace ji vystavte na stálé adrese (třeba export z Google Tabulek nebo vlastní server), import si ji pak načte při každém přegenerování sám.</p>
     </li>
     <li>
@@ -377,6 +385,10 @@ Co je dobré vědět před nákupem
   <div class="verified">
     <strong>Ověřeno v listopadu 2026</strong>
     Na katalogu e-shopu s technickým sortimentem (3 167 produktů): tabulka se 153 doplňky z 6 článků a recenzí, jeden import, jedno přepisování a jeden výběr. Přegenerování proběhlo bez chyb, doplněk má ve výstupu právě 153 produktů, nadpis je u každého jednou a žádný popisek nepřekročil 5 000 znaků. Produkty bez doplňku zůstaly beze změny.
+  </div>
+  <div class="verified">
+    <strong>Ověřeno na druhém katalogu</strong>
+    E-shop s oblečením a doplňky (375 položek, každá velikost zvlášť): 30 tvrzení ze 4 návodů, 3 tabulek velikostí a 91 recenzí, z toho 6 zamítnutých kvůli rozporům nebo slabému dokladu. Doplněk dostalo 215 položek ve 28 modelech. Zbylých 160 nemá v žádném zdroji doložené tvrzení, takže doplněk nedostalo, a to je správně. Jeden produkt s popiskem dlouhým 4 994 znaků kontrola délky vyřadila.
   </div>
 
   <h3>Totéž se hodí i pro další pole</h3>

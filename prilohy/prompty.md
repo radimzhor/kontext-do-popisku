@@ -9,6 +9,9 @@ Prompty jsou psané pro Claude Code se složkou klienta (CLAUDE.md agentury, kon
 ```
 Pracuji pro e-shop [klient]. V souboru [data/recenze] jsou recenze jeho produktů.
 
+Nejdřív ověř, že máš všechny zdroje recenzí (export platformy, tabulky po migraci,
+srovnávače, recenze uložené v projektu v Mergadu). Když se počty u stejného produktu liší, upozorni mě.
+
 Vytáhni z nich tvrzení o produktech podle schématu v 03-tvrzeni-schema.md.
 Tvrzení je věta o tom, co o produktu platí. Není to citace toho, co kdo napsal.
 
@@ -37,7 +40,8 @@ Pravidla:
 - Když si článek protiřečí, napiš mi to a nech obě verze.
 - U každého tvrzení navrhni selektor: podle čeho v katalogu poznám produkty, kterých
   se týká (název, kategorie, parametr). Ověř ho přes Mergado MCP na projektu [ID]:
-  kolik produktů vybere a 5 příkladů. Upozorni, kde by mohl zradit.
+  kolik produktů vybere a 5 příkladů. Vypiš i produkty, které do selektoru spadly,
+  ale tvrzení na ně neplatí (doplňky, poukazy, příbuzné produkty), a vyluč je.
 - Do segmentu dej jen to, co platí bez výjimky pro celou skupinu.
 
 Výstup: řádky do tvrzeni.csv (druh = segment, stav = navrženo).
@@ -58,7 +62,10 @@ Co do doplňku patří:
 - výhrady napsané věcně jako vlastnost produktu, bez zmínky o recenzích
 
 Pravidla:
-- Nic, co už v popisku je, neopakuj.
+- Nic, co už v popisku je, neopakuj. Posuzuj to po smyslu, ne podle shody slov.
+- Když tvrzení s popiskem nesouhlasí i jen nepřímo (popisek "pohodlná na celodenní túry",
+  tvrzení "po pár hodinách tlačí"), nepiš ho a dej produkt do seznamu k rozhodnutí.
+- Bezpečnostní tvrzení nepřenášej na produkty se zvláštním určením (např. zdravotní pomůcky).
 - Čísla jen z tvrzení.
 - Když si tvrzení s popiskem odporuje, nepiš ani jedno a dej produkt do seznamu k rozhodnutí.
 - Nejvýš 4 odrážky, každá nejvýš 2 věty, celý doplněk do 600 znaků.
@@ -68,7 +75,9 @@ Pravidla:
 - Nadpis bloku nepiš, přidá ho pravidlo v Mergadu.
 
 Výstup:
-1. doplnek-popisu.csv se sloupci g:id a DOPLNEK_POPISU (odrážky začínají "- ",
+1. doplnek-popisu.csv se sloupci g:id a DOPLNEK_POPISU. Když se doplněk liší jen mezi
+   modely, ne mezi velikostmi, použij místo g:id item_group_id (jeden řádek na model).
+   (odrážky začínají "- ",
    každá na novém řádku v jedné buňce, oddělovač středník).
 2. Kontrolní tabulka: g:id | odrážka | z jakého tvrzení | zdroj.
 3. Seznam produktů k rozhodnutí (rozpory, slabě doložená tvrzení, přetečení délky).
