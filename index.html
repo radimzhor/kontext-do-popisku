@@ -1,0 +1,405 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Kontext do popisků</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Postup pro agentury: z recenzí a článků klienta tvrzení, z tvrzení doplněk popisku a jeho zápis do feedu v Mergadu.">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one reading column (~44rem) with a wide figure break-out for the data-flow diagram; numbered steps because the work is a real sequence. */
+:root {
+  --ground: #f4f6f8;
+  --surface: #ffffff;
+  --sunk: #e8edf1;
+  --ink: #16202a;
+  --ink-soft: #4a5866;
+  --ink-faint: #7b8794;
+  --rule: #d3dbe2;
+  --accent: #b4530d;
+  --accent-soft: #fbeee2;
+  --agent: #2f5f8a;
+  --agent-soft: #e4eef7;
+  --f-display: "Schibsted Grotesk", "Helvetica Neue", Arial, sans-serif;
+  --f-body: "IBM Plex Sans", system-ui, -apple-system, sans-serif;
+  --f-mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+  --s--1: .86rem;
+  --s-0: 1.02rem;
+  --s-1: 1.22rem;
+  --s-2: 1.55rem;
+  --s-3: clamp(2rem, 1.5rem + 2.2vw, 2.9rem);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ground: #10161c; --surface: #172029; --sunk: #0c1116;
+    --ink: #e6ebf0; --ink-soft: #a9b5c1; --ink-faint: #7d8a97; --rule: #2b3743;
+    --accent: #f0a35e; --accent-soft: #2e2116; --agent: #8ab8e3; --agent-soft: #182736;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --ground: #10161c; --surface: #172029; --sunk: #0c1116;
+  --ink: #e6ebf0; --ink-soft: #a9b5c1; --ink-faint: #7d8a97; --rule: #2b3743;
+  --accent: #f0a35e; --accent-soft: #2e2116; --agent: #8ab8e3; --agent-soft: #182736;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--ground); color: var(--ink);
+  font-family: var(--f-body); font-size: var(--s-0); line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 2.5rem 4rem;
+}
+.col { max-width: 44rem; margin-inline: auto; }
+.wide { max-width: 68rem; margin-inline: auto; }
+h1, h2, h3 { font-family: var(--f-display); line-height: 1.12; text-wrap: balance; margin: 0; }
+h1 { font-size: var(--s-3); letter-spacing: -.02em; }
+h2 { font-size: var(--s-2); margin-top: 3rem; margin-bottom: .8rem; }
+h3 { font-size: var(--s-1); margin-top: 1.6rem; margin-bottom: .5rem; }
+p { margin: 0 0 .9rem; text-wrap: pretty; }
+a { color: var(--accent); text-underline-offset: 2px; }
+a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+code, .mono { font-family: var(--f-mono); font-size: .9em; }
+code { background: var(--sunk); padding: .05em .35em; border-radius: 4px; }
+ul, ol { padding-left: 1.2rem; margin: 0 0 1rem; }
+li { margin-bottom: .35rem; }
+.eyebrow { font-family: var(--f-mono); font-size: var(--s--1); letter-spacing: .06em; text-transform: uppercase; color: var(--ink-faint); margin-bottom: .7rem; }
+.lede { font-size: var(--s-1); color: var(--ink-soft); margin-top: 1rem; }
+
+figure { margin: 2.2rem auto 0; }
+.diagram { background: var(--surface); border: 1px solid var(--rule); border-radius: 12px; padding: 1rem; overflow-x: auto; }
+.diagram svg { display: block; width: 100%; min-width: 760px; height: auto; color: var(--ink); }
+figcaption { font-size: var(--s--1); color: var(--ink-soft); margin-top: .7rem; max-width: 44rem; }
+.key { display: flex; flex-wrap: wrap; gap: .4rem 1.2rem; font-size: var(--s--1); color: var(--ink-soft); margin-top: .5rem; }
+.key span::before { content: ""; display: inline-block; width: 1.4rem; height: 0; border-top: 2px solid currentColor; vertical-align: middle; margin-right: .4rem; }
+.key .k-acc { color: var(--accent); }
+.key .k-agent { color: var(--agent); }
+.key .k-dash::before { border-top-style: dashed; }
+.key .k-acc, .key .k-agent, .key .k-dash { font-weight: 600; }
+
+.roles { display: grid; gap: .6rem; margin-top: 1rem; }
+.role { display: grid; grid-template-columns: 8.5rem 1fr; gap: 1rem; padding: .8rem 0; border-top: 1px solid var(--rule); }
+.role:last-child { border-bottom: 1px solid var(--rule); }
+.role b { font-family: var(--f-display); font-size: var(--s-0); }
+.role div { min-width: 0; color: var(--ink-soft); }
+.role .where { display: block; font-family: var(--f-mono); font-size: var(--s--1); color: var(--ink-faint); font-weight: 400; margin-top: .15rem; }
+
+.steps { list-style: none; padding: 0; counter-reset: s; margin-top: 1.2rem; }
+.steps > li { counter-increment: s; position: relative; padding-left: 3rem; margin-bottom: 2.2rem; }
+.steps > li::before {
+  content: counter(s); position: absolute; left: 0; top: .1rem;
+  width: 2rem; height: 2rem; border-radius: 50%; display: grid; place-items: center;
+  font-family: var(--f-mono); font-size: .9rem; background: var(--ink); color: var(--ground);
+}
+.steps h3 { margin-top: 0; }
+.who { display: inline-block; font-family: var(--f-mono); font-size: .78rem; padding: .1rem .5rem; border-radius: 99px; margin-left: .3rem; vertical-align: .15em; font-weight: 500; }
+.who.agent { background: var(--agent-soft); color: var(--agent); }
+.who.script { background: var(--sunk); color: var(--ink-soft); }
+.who.you { background: var(--accent-soft); color: var(--accent); }
+.who.mergado { background: var(--sunk); color: var(--ink); }
+
+.scroll { overflow-x: auto; margin: .6rem 0 1.2rem; }
+table { border-collapse: collapse; width: 100%; font-size: var(--s--1); }
+th, td { text-align: left; vertical-align: top; padding: .5rem .6rem; border-bottom: 1px solid var(--rule); }
+th { font-weight: 600; color: var(--ink-soft); white-space: nowrap; }
+td.num { font-variant-numeric: tabular-nums; }
+
+pre { font-family: var(--f-mono); font-size: .84rem; line-height: 1.55; background: var(--sunk); border-radius: 8px; padding: .9rem 1rem; overflow-x: auto; margin: .6rem 0 1rem; white-space: pre; }
+.out { background: var(--surface); border: 1px solid var(--rule); border-radius: 8px; padding: .9rem 1rem; font-size: var(--s--1); margin: .6rem 0 1rem; }
+.out .old { color: var(--ink-faint); }
+.out .new { border-left: 3px solid var(--accent); padding-left: .8rem; margin-top: .6rem; }
+.out .new b { display: block; margin-bottom: .2rem; }
+
+.verified { border-left: 3px solid var(--agent); background: var(--agent-soft); padding: .9rem 1rem; border-radius: 0 8px 8px 0; margin: 1rem 0 1.2rem; font-size: var(--s--1); }
+.verified strong:first-child { display: block; font-family: var(--f-mono); font-weight: 500; letter-spacing: .04em; text-transform: uppercase; font-size: .76rem; color: var(--agent); margin-bottom: .3rem; }
+
+.files { list-style: none; padding: 0; margin-top: 1rem; display: grid; gap: .5rem; }
+.files li { display: grid; grid-template-columns: minmax(0, 15rem) 1fr; gap: 1rem; padding: .7rem .9rem; background: var(--surface); border: 1px solid var(--rule); border-radius: 8px; margin: 0; }
+.files a { font-family: var(--f-mono); font-size: .88rem; word-break: break-all; }
+.files span { color: var(--ink-soft); font-size: var(--s--1); min-width: 0; }
+
+footer { margin-top: 3.5rem; padding-top: 1.2rem; border-top: 1px solid var(--rule); font-size: var(--s--1); color: var(--ink-soft); }
+
+@media (max-width: 560px) {
+  .role { grid-template-columns: 1fr; gap: .2rem; }
+  .files li { grid-template-columns: 1fr; gap: .2rem; }
+  .steps > li { padding-left: 2.6rem; }
+}
+</style>
+
+<header class="col">
+  <div class="eyebrow">Postup pro agentury · Mergado</div>
+  <h1>Kontext do popisků</h1>
+  <p class="lede">Jak u nového klienta dostat do feedu to, co o produktech vědí zákazníci a jeho vlastní články. Z recenzí a návodů se nejdřív vytáhnou tvrzení, ta se zkontrolují a teprve z nich vznikne doplněk popisku, který Mergado připojí pod stávající text.</p>
+</header>
+
+<figure class="wide">
+  <div class="diagram">
+    <svg viewBox="0 0 1040 610" role="img" aria-label="Schéma: zdroje kontextu stahuje skript do složky klienta na počítači agentury. Agent v Claude Code ze složky čte, píše tvrzení a doplňky ke schválení a přes Mergado MCP nastavuje projekt. Tabulka doplňků jde importem do skrytého elementu a pravidlo ji připojí k popisku ve výstupním feedu." font-family="IBM Plex Sans, system-ui, sans-serif">
+      <defs>
+        <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="currentColor"/></marker>
+        <marker id="ara" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="var(--accent)"/></marker>
+        <marker id="arg" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="var(--agent)"/></marker>
+      </defs>
+
+      <!-- column headers -->
+      <g font-family="IBM Plex Mono, monospace" font-size="11" letter-spacing="1.2" fill="var(--ink-faint)">
+        <text x="16" y="30">ZDROJE KONTEXTU</text>
+        <text x="236" y="30">POČÍTAČ AGENTURY</text>
+        <text x="680" y="30">MERGADO</text>
+      </g>
+      <rect x="226" y="42" width="424" height="556" rx="12" fill="none" stroke="var(--rule)" stroke-width="1.5"/>
+      <rect x="670" y="42" width="354" height="556" rx="12" fill="none" stroke="var(--rule)" stroke-width="1.5"/>
+
+      <!-- sources -->
+      <g fill="var(--surface)" stroke="currentColor" stroke-width="1.2">
+        <rect x="16" y="64" width="180" height="56" rx="8"/>
+        <rect x="16" y="134" width="180" height="56" rx="8"/>
+        <rect x="16" y="204" width="180" height="56" rx="8"/>
+        <rect x="16" y="274" width="180" height="56" rx="8"/>
+      </g>
+      <g font-size="13" font-weight="600" fill="currentColor">
+        <text x="28" y="88">Recenze produktů</text>
+        <text x="28" y="158">Články a návody</text>
+        <text x="28" y="228">Zákaznická podpora</text>
+        <text x="28" y="298">Produktová data</text>
+      </g>
+      <g font-size="11" fill="var(--ink-soft)">
+        <text x="28" y="106">Heureka, e-shop</text>
+        <text x="28" y="176">blog klienta</text>
+        <text x="28" y="246">FAQ, časté dotazy</text>
+        <text x="28" y="316">vstupní feed</text>
+      </g>
+      <g stroke="currentColor" stroke-width="1.2" fill="none" marker-end="url(#ar)">
+        <line x1="196" y1="92" x2="244" y2="104"/>
+        <line x1="196" y1="162" x2="244" y2="124"/>
+        <line x1="196" y1="232" x2="244" y2="144"/>
+        <line x1="196" y1="302" x2="244" y2="162"/>
+      </g>
+      <text x="150" y="56" font-size="11" fill="var(--ink-soft)">export, API</text>
+      <text x="16" y="360" font-size="11" fill="var(--ink-faint)">Recenze a metriky umí</text>
+      <text x="16" y="375" font-size="11" fill="var(--ink-faint)">dodat i Mergado Depots</text>
+
+      <!-- script -->
+      <rect x="246" y="64" width="180" height="116" rx="8" fill="var(--sunk)" stroke="currentColor" stroke-width="1.2"/>
+      <text x="258" y="88" font-size="14" font-weight="700" fill="currentColor" font-family="Schibsted Grotesk, sans-serif">Skript</text>
+      <text x="258" y="104" font-size="11" fill="var(--ink-soft)">deterministické kroky</text>
+      <g font-size="12" fill="currentColor">
+        <text x="258" y="126">sběr, normalizace</text>
+        <text x="258" y="144">agregace na produkt</text>
+        <text x="258" y="162">slití, kontrola délky</text>
+      </g>
+      <line x1="336" y1="180" x2="336" y2="216" stroke="currentColor" stroke-width="1.2" marker-end="url(#ar)"/>
+      <text x="344" y="203" font-size="11" fill="var(--ink-soft)">zapíše data</text>
+
+      <!-- folder -->
+      <rect x="246" y="220" width="180" height="300" rx="8" fill="var(--surface)" stroke="currentColor" stroke-width="1.2"/>
+      <text x="258" y="244" font-size="14" font-weight="700" fill="currentColor" font-family="Schibsted Grotesk, sans-serif">Složka klienta</text>
+      <text x="258" y="260" font-size="11" fill="var(--ink-soft)">lokálně, nebo Mergado Contexts</text>
+      <g font-family="IBM Plex Mono, monospace" font-size="11.5" fill="currentColor">
+        <text x="258" y="290">CLAUDE.md</text>
+        <text x="258" y="312">kontext-klienta.md</text>
+        <text x="258" y="334">ton-komunikace.md</text>
+        <text x="258" y="356">brief-popisky.md</text>
+        <text x="258" y="378">data/recenze.jsonl</text>
+        <text x="258" y="400">data/clanky/</text>
+        <text x="258" y="430" font-weight="500">tvrzeni.csv</text>
+        <text x="258" y="460" font-weight="500" fill="var(--accent)">doplnek-popisu.csv</text>
+        <text x="258" y="490">historie-zmen.md</text>
+      </g>
+
+      <!-- agent -->
+      <rect x="486" y="220" width="150" height="150" rx="8" fill="var(--agent-soft)" stroke="var(--agent)" stroke-width="1.5"/>
+      <text x="498" y="244" font-size="14" font-weight="700" fill="var(--agent)" font-family="Schibsted Grotesk, sans-serif">Agent</text>
+      <text x="498" y="260" font-size="11" fill="var(--ink-soft)">Claude Code v terminálu</text>
+      <g font-size="12" fill="currentColor">
+        <text x="498" y="286">vytáhne tvrzení</text>
+        <text x="498" y="306">napíše doplňky</text>
+        <text x="498" y="326">nastaví pravidla</text>
+        <text x="498" y="346">ověří na vzorku</text>
+      </g>
+      <line x1="428" y1="290" x2="484" y2="290" stroke="var(--agent)" stroke-width="1.5" marker-start="url(#arg)" marker-end="url(#arg)"/>
+      <text x="456" y="280" font-size="11" fill="var(--ink-soft)" text-anchor="middle">čte</text>
+      <text x="456" y="306" font-size="11" fill="var(--ink-soft)" text-anchor="middle">píše</text>
+
+      <!-- you -->
+      <rect x="486" y="430" width="150" height="90" rx="8" fill="var(--accent-soft)" stroke="var(--accent)" stroke-width="1.5"/>
+      <text x="498" y="454" font-size="14" font-weight="700" fill="var(--accent)" font-family="Schibsted Grotesk, sans-serif">Vy</text>
+      <g font-size="12" fill="currentColor">
+        <text x="498" y="476">schválíte tvrzení</text>
+        <text x="498" y="494">a vzorek doplňků</text>
+      </g>
+      <line x1="561" y1="372" x2="561" y2="428" stroke="currentColor" stroke-width="1.2" marker-start="url(#ar)" marker-end="url(#ar)"/>
+      <text x="569" y="404" font-size="11" fill="var(--ink-soft)">ke schválení</text>
+
+      <!-- Mergado: Depots, Contexts -->
+      <rect x="690" y="64" width="314" height="60" rx="8" fill="var(--surface)" stroke="currentColor" stroke-width="1.2"/>
+      <text x="702" y="88" font-size="13" font-weight="600" fill="currentColor">Depots</text>
+      <text x="702" y="106" font-size="11" fill="var(--ink-soft)">recenze Heureka, GA, Search Console, Sklik</text>
+      <rect x="690" y="140" width="314" height="60" rx="8" fill="var(--surface)" stroke="currentColor" stroke-width="1.2" stroke-dasharray="5 4"/>
+      <text x="702" y="164" font-size="13" font-weight="600" fill="currentColor">Contexts</text>
+      <text x="702" y="182" font-size="11" fill="var(--ink-soft)">kontext klienta uložený u e-shopu</text>
+
+      <path d="M690 94 H600 V218" fill="none" stroke="var(--agent)" stroke-width="1.5" marker-end="url(#arg)"/>
+      <text x="610" y="86" font-size="11" fill="var(--agent)">MCP: data</text>
+      <path d="M690 170 H646 V218" fill="none" stroke="var(--agent)" stroke-width="1.5" stroke-dasharray="5 4" marker-end="url(#arg)"/>
+
+      <!-- Mergado project -->
+      <rect x="690" y="224" width="314" height="354" rx="8" fill="var(--surface)" stroke="currentColor" stroke-width="1.2"/>
+      <text x="702" y="248" font-size="13" font-weight="600" fill="currentColor">Projekt pro kanál</text>
+      <text x="702" y="264" font-size="11" fill="var(--ink-soft)">pravidla běží při každém přegenerování</text>
+      <g stroke="currentColor" stroke-width="1.1" fill="var(--sunk)">
+        <rect x="710" y="282" width="274" height="40" rx="6"/>
+        <rect x="710" y="502" width="274" height="56" rx="6"/>
+      </g>
+      <rect x="710" y="350" width="274" height="54" rx="6" fill="var(--accent-soft)" stroke="var(--accent)" stroke-width="1.5"/>
+      <rect x="710" y="426" width="274" height="54" rx="6" fill="var(--accent-soft)" stroke="var(--accent)" stroke-width="1.5"/>
+      <g font-size="12.5" font-weight="600" fill="currentColor">
+        <text x="722" y="307">Vstupní feed e-shopu</text>
+        <text x="722" y="372">Import dat</text>
+        <text x="722" y="448">Přepisování popisku</text>
+        <text x="722" y="525">Výstupní feed</text>
+      </g>
+      <g font-size="11" fill="var(--ink-soft)">
+        <text x="722" y="391">→ skrytý element DOPLNEK_POPISU</text>
+        <text x="722" y="467">popisek + nadpis + doplněk</text>
+        <text x="722" y="543">Google Nákupy, ChatGPT, srovnávače</text>
+      </g>
+      <g stroke="currentColor" stroke-width="1.2" marker-end="url(#ar)">
+        <line x1="847" y1="322" x2="847" y2="348"/>
+        <line x1="847" y1="404" x2="847" y2="424"/>
+        <line x1="847" y1="480" x2="847" y2="500"/>
+      </g>
+
+      <!-- agent -> project -->
+      <line x1="636" y1="330" x2="708" y2="330" stroke="var(--agent)" stroke-width="1.5" marker-end="url(#arg)"/>
+      <text x="642" y="322" font-size="11" fill="var(--agent)">MCP</text>
+
+      <!-- csv -> import (accent path) -->
+      <path d="M336 520 V572 H676 V377 H708" fill="none" stroke="var(--accent)" stroke-width="2" marker-end="url(#ara)"/>
+      <text x="350" y="566" font-size="11.5" fill="var(--accent)" font-weight="600">doplnek-popisu.csv na stálé adrese</text>
+      <text x="350" y="590" font-size="11" fill="var(--ink-soft)">import si ji načte při každém přegenerování</text>
+    </svg>
+  </div>
+  <figcaption>Kde co leží a kdo co dělá. Skript stahuje a skládá data, agent z nich píše, vy schvalujete a Mergado jen připojí hotový doplněk k popisku. Oranžově je cesta doplňku do feedu, modře práce agenta přes Mergado MCP. Čárkovaně Contexts jako alternativa k lokální složce.</figcaption>
+</figure>
+
+<main class="col">
+
+  <h2>Kdo co dělá</h2>
+  <div class="roles">
+    <div class="role"><b>Zdroje<span class="where">u klienta a na webu</span></b><div>Recenze, články a návody z blogu, odpovědi zákaznické podpory a produktová data z feedu. Recenze z Heureky a metriky z GA, Search Console nebo Skliku umí dodat i rozšíření Mergado Depots, agent je pak čte přímo přes MCP a odpadá export.</div></div>
+    <div class="role"><b>Složka klienta<span class="where">lokálně, nebo Contexts</span></b><div>Jedno místo, kde leží všechno o klientovi: pravidla agentury, kontext klienta, tón, brief k popiskům, surová data a výstupy (tvrzení, doplňky). Místo lokální složky jde použít Mergado Contexts, pak kontext vidí každý, kdo s e-shopem pracuje.</div></div>
+    <div class="role"><b>Skript<span class="where">Python ve složce</span></b><div>Všechno, co má vyjít pokaždé stejně: stažení dat, sjednocení formátu, seskupení recenzí k produktům, vyhodnocení selektorů segmentů, slití doplňků do jedné tabulky a kontrola délky. Model na to není potřeba a skript se dá otestovat.</div></div>
+    <div class="role"><b>Agent<span class="where">Claude Code v terminálu</span></b><div>Práce s jazykem a s Mergadem: vytáhne tvrzení, napíše doplňky, navrhne a založí pravidla přes Mergado MCP a ověří je na sledovaných produktech. Řídí se souborem CLAUDE.md agentury.</div></div>
+    <div class="role"><b>Vy<span class="where">dvě kontrolní místa</span></b><div>Schválíte tvrzení, než se z nich začne psát, a vzorek doplňků, než se škáluje. Přegenerování feedu spouštíte vy.</div></div>
+    <div class="role"><b>Mergado<span class="where">projekt pro kanál</span></b><div>Import dat nahraje tabulku doplňků do skrytého elementu, jedno pravidlo Přepisování ho připojí k popisku. Při aktualizaci se jen vymění tabulka, pravidla zůstávají.</div></div>
+  </div>
+
+  <h2>Postup u nového klienta</h2>
+  <ol class="steps">
+    <li>
+      <h3>Posbírejte kontext na jedno místo <span class="who you">vy</span></h3>
+      <p>Založte složku klienta podle šablon v přílohách: pravidla agentury (<code>CLAUDE.md</code>), kontext klienta, tón komunikace a brief k popiskům. Pak do <code>data/</code> stáhněte recenze a 3 až 5 článků nebo návodů, které vysvětlují, jak vybírat a používat sortiment. Víc článků ze začátku nepotřebujete.</p>
+    </li>
+    <li>
+      <h3>Sjednoťte a seskupte data <span class="who script">skript</span></h3>
+      <p>Recenze z různých zdrojů převeďte na jeden formát, odfiltrujte prázdné („spokojenost“, „funguje“) a seskupte je k produktům podle ID nebo EAN. Pozor na recenze, které visí u víc produktů najednou. Jsou slabším dokladem a skript by je měl označit.</p>
+    </li>
+    <li>
+      <h3>Vytáhněte tvrzení <span class="who agent">agent</span> <span class="who you">vy</span></h3>
+      <p>Tvrzení je věta o tom, co o produktu platí, se sedmi poli: entita, vlastnost, důsledek, podmínka, vymezení, jazyk zákazníka a zdroj. Z recenzí vznikají <strong>tvrzení na produkt</strong>, z článků <strong>tvrzení na segment</strong> se selektorem, podle kterého agent ve feedu najde produkty, kterých se týká.</p>
+      <div class="scroll">
+        <table>
+          <thead><tr><th>Pole</th><th>Ukázka</th></tr></thead>
+          <tbody>
+            <tr><td>entita</td><td>Trekové boty s membránou</td></tr>
+            <tr><td>vlastnost</td><td>Membrána nepropustí vodu ani při celodenním dešti</td></tr>
+            <tr><td>důsledek</td><td>Na vícedenní trek zůstanou nohy suché</td></tr>
+            <tr><td>podmínka</td><td>Svršek se musí pravidelně impregnovat</td></tr>
+            <tr><td>vymezení</td><td>V horkém létě se noha potí víc než v botě bez membrány</td></tr>
+            <tr><td>jazyk zákazníka</td><td>„promokají?“, „dají se nosit v létě?“</td></tr>
+            <tr><td>zdroj</td><td>článek „Jak vybrat trekové boty“</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>Dvě pravidla platí bez výjimky: čísla se negenerují, jen přenášejí, a každé tvrzení má zdroj. Tvrzení si projděte a schvalte, než se z nich začne psát. Tady se chyby chytají nejlevněji.</p>
+    </li>
+    <li>
+      <h3>Napište doplněk popisku <span class="who agent">agent</span> <span class="who you">vy</span></h3>
+      <p>Stávající popisek se nepřepisuje. Pod něj přibude krátký blok s tím, co popisek výrobce neříká: co zákazník k produktu potřebuje, kdy se nehodí, na co si dát pozor. Nejvýš 4 odrážky a 600 znaků. Co už v popisku je, se neopakuje. Když si tvrzení s popiskem odporuje, nepíše se ani jedno.</p>
+      <div class="out">
+        <div class="old">Treková bota s membránou a gumovou špičkou. Svršek z broušené kůže, podrážka s hlubokým vzorkem…</div>
+        <div class="new"><b>Co je dobré vědět před nákupem</b>
+          - Membrána nepropustí vodu ani při celodenním dešti, pokud je svršek pravidelně impregnovaný. V horkém létě se v ní noha potí víc.<br>
+          - Čistěte jen vodou a měkkým kartáčem, bez pračky a bez prostředků se silikonem.<br>
+          - Bota se nemusí rozchodit. Na úzkou nohu je v patě volnější.
+        </div>
+      </div>
+      <p>Agent výsledek zapíše do tabulky <code>doplnek-popisu.csv</code>: jeden řádek na produkt, sloupce <code>g:id</code> a <code>DOPLNEK_POPISU</code>, jen odrážky. Odrážky ze segmentu i z recenzí jsou u produktu v jedné buňce, takže nadpis vyjde vždycky jen jednou. Začněte vzorkem 20 až 50 produktů v méně důležité kategorii.</p>
+    </li>
+    <li>
+      <h3>Dostaňte doplněk do feedu <span class="who agent">agent</span> <span class="who mergado">Mergado</span></h3>
+      <p>Na celý katalog stačí jeden import, jedno pravidlo a jeden výběr. Agent je založí přes Mergado MCP, až plán odsouhlasíte:</p>
+      <ol>
+        <li>skrytý element <code>DOPLNEK_POPISU</code>,</li>
+        <li><strong>Import dat</strong> z tabulky, párování přes <code>g:id</code>, importuje se jen tenhle element,</li>
+        <li>výběr „<code>DOPLNEK_POPISU</code> není prázdný“,</li>
+        <li><strong>Přepisování</strong> výstupního popisku nad tím výběrem:</li>
+      </ol>
+<pre>%g:description%
+
+Co je dobré vědět před nákupem
+%DOPLNEK_POPISU%</pre>
+      <p>Pravidlo zapisujte do výstupního elementu (u Googlu <code>g:description</code>), ne do vstupního <code>description</code>, převod formátu ho přepisuje dřív. Import musí v pořadí pravidel běžet před přepisováním. Před přegenerováním nechte agenta ověřit tři sledované produkty: jeden s doplňkem, jeden s odrážkami ze segmentu i z recenze a jeden bez doplňku, který se nesmí změnit.</p>
+      <div class="scroll">
+        <table>
+          <thead><tr><th>Varianta</th><th>Pravidla</th><th>Výběry</th><th>Co roste s katalogem</th></tr></thead>
+          <tbody>
+            <tr><td>Pravidlo na každý segment a produkt</td><td>jedno na každý</td><td>jeden na každý</td><td>pravidla i výběry</td></tr>
+            <tr><td>Hromadná pravidla s tabulkou řádků</td><td class="num">2</td><td>jeden na segment</td><td>výběry a řádky v pravidlech</td></tr>
+            <tr><td><strong>Import a připojení</strong></td><td class="num">2</td><td class="num">1</td><td>jen řádky v importní tabulce</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>Na začátek stačí tabulku do importu nahrát jako soubor. Pro pravidelné aktualizace ji vystavte na stálé adrese (třeba export z Google Tabulek nebo vlastní server), import si ji pak načte při každém přegenerování sám.</p>
+    </li>
+    <li>
+      <h3>Kontrolujte a škálujte <span class="who script">skript</span> <span class="who you">vy</span></h3>
+      <ul>
+        <li><strong>Délka:</strong> původní popisek a doplněk se dohromady musí vejít do limitu kanálu, u Googlu 5 000 znaků. Skript to ověří před nahráním.</li>
+        <li><strong>Opakování:</strong> doplněk nesmí zopakovat, co už výrobce napsal. Skript zná původní popisek, takže to může porovnat.</li>
+        <li><strong>Rozpory v segmentu:</strong> do segmentu patří jen to, co platí bez výjimky pro celou skupinu. Vlastnost, která se mezi produkty liší, patří k produktu.</li>
+        <li><strong>Po přegenerování:</strong> počet produktů s doplňkem ve výstupu se musí rovnat počtu řádků v tabulce a nadpis bloku se nesmí objevit dvakrát.</li>
+      </ul>
+    </li>
+  </ol>
+
+  <div class="verified">
+    <strong>Ověřeno v listopadu 2026</strong>
+    Na katalogu e-shopu s technickým sortimentem (3 167 produktů): tabulka se 153 doplňky z 6 článků a recenzí, jeden import, jedno přepisování a jeden výběr. Přegenerování proběhlo bez chyb, doplněk má ve výstupu právě 153 produktů, nadpis je u každého jednou a žádný popisek nepřekročil 5 000 znaků. Produkty bez doplňku zůstaly beze změny.
+  </div>
+
+  <h3>Totéž se hodí i pro další pole</h3>
+  <p>Ze stejných schválených tvrzení jde napsat otázky a odpovědi (<code>g:question_and_answer</code>), product highlights a product details. Titulky naopak stačí řídit best practices kanálu, tedy strukturou, parametry a délkou. Recenze ani velký kontext tam potřeba nejsou.</p>
+
+  <h2 id="prilohy">Přílohy</h2>
+  <p>Šablony jsou v Markdownu, stačí je zkopírovat do složky klienta a vyplnit hranaté závorky. Ukázková data jsou ze smyšleného e-shopu s outdoorovým vybavením.</p>
+  <ul class="files">
+    <li><a href="prilohy/01-CLAUDE-agentura.md">01-CLAUDE-agentura.md</a><span>Pravidla agentury pro práci v Mergadu, včetně postupu kontext → tvrzení → doplněk.</span></li>
+    <li><a href="prilohy/02-kontext-klienta.md">02-kontext-klienta.md</a><span>Kontext jednoho klienta: byznys, USP, pravidla pro data, produktové know-how. Hodí se i do Mergado Contexts.</span></li>
+    <li><a href="prilohy/03-tvrzeni-schema.md">03-tvrzeni-schema.md</a><span>Sedm polí tvrzení, tvrzení na produkt a na segment, pravidla a sloupce tabulky.</span></li>
+    <li><a href="prilohy/04-brief-popisky.md">04-brief-popisky.md</a><span>Zadání k popiskům jedné skupiny produktů, včetně zápisu do Mergada.</span></li>
+    <li><a href="prilohy/05-ton-komunikace.md">05-ton-komunikace.md</a><span>Oslovení, styl, co používat a co ne.</span></li>
+    <li><a href="prilohy/06-historie-zmen.md">06-historie-zmen.md</a><span>Tabulka změn a rozhodnutí, ať agent nezkouší, co už nefungovalo.</span></li>
+    <li><a href="prilohy/prompty.md">prompty.md</a><span>Pět promptů: recenze → tvrzení, článek → tvrzení, tvrzení → doplněk, zápis do Mergada, volitelně Q&amp;A.</span></li>
+    <li><a href="prilohy/ukazka-tvrzeni.csv">ukazka-tvrzeni.csv</a><span>Ukázková tabulka tvrzení se všemi sloupci.</span></li>
+    <li><a href="prilohy/ukazka-doplnek-popisu.csv">ukazka-doplnek-popisu.csv</a><span>Ukázková importní tabulka doplňků pro Mergado.</span></li>
+  </ul>
+
+  <footer>
+    <p>Další zdroje: <a href="https://help.mergado.com" target="_blank" rel="noopener">nápověda Mergada</a> a <a href="https://github.com/mergado/mergado-skills" target="_blank" rel="noopener">Mergado skilly</a>.</p>
+    <p>Připravil Radim Zhoř, Mergado.</p>
+  </footer>
+</main>
+
+</body></html>
