@@ -2,9 +2,9 @@
 
 Postup pro agentury: jak u nového klienta dostat do produktového feedu to, co o produktech vědí zákazníci a jeho vlastní články. Z recenzí a návodů se nejdřív vytáhnou tvrzení, ta se zkontrolují a teprve z nich vznikne doplněk popisku, který Mergado připojí pod stávající text.
 
-- **Průvodce:** https://radim-zhor.github.io/kontext-do-popisku/
+- **Průvodce:** https://radimzhor.github.io/kontext-do-popisku/
 - **Šablony a prompty:** složka [`prilohy/`](prilohy/)
-- **Konkrétní verze:** [Releases](https://github.com/radim-zhor/kontext-do-popisku/releases)
+- **Konkrétní verze:** [Releases](https://github.com/radimzhor/kontext-do-popisku/releases)
 
 ## Obsah
 
